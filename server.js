@@ -40,8 +40,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Admin fixo
-const adminEmail = "admin@papelaria.com";
-const adminPassword = bcrypt.hashSync("123456", 10);
+const adminEmail = "anavitoria@papelaria.com";
+const adminPassword = bcrypt.hashSync("Ana@2008", 10);
 
 // Middleware de autenticação
 function isAuth(req, res, next) {
