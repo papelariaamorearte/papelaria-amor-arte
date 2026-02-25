@@ -1,3 +1,4 @@
+// server.js - pronto para Render
 const express = require("express");
 const Database = require("better-sqlite3");
 const multer = require("multer");
@@ -8,7 +9,9 @@ const path = require("path");
 const app = express();
 const db = new Database("database.db");
 
+// Configurações
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // necessário para DELETE
 app.use(express.static("public"));
 
 app.use(session({
@@ -17,7 +20,7 @@ app.use(session({
     saveUninitialized: false
 }));
 
-// Criar tabela
+// Criar tabela de produtos
 db.prepare(`
 CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,7 +30,7 @@ CREATE TABLE IF NOT EXISTS products (
 )
 `).run();
 
-// Upload
+// Upload de imagens
 const storage = multer.diskStorage({
     destination: "public/uploads/",
     filename: (req, file, cb) => {
@@ -40,22 +43,25 @@ const upload = multer({ storage });
 const adminEmail = "admin@papelaria.com";
 const adminPassword = bcrypt.hashSync("123456", 10);
 
+// Middleware de autenticação
 function isAuth(req, res, next) {
     if (req.session.logged) return next();
-    res.redirect("/login.html");
+    res.status(401).json({ error: "Não autorizado" });
 }
 
+// Login
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
 
-    if (email === adminEmail && bcrypt.compareSync(password, adminPassword)) {
+    if(email === adminEmail && bcrypt.compareSync(password, adminPassword)){
         req.session.logged = true;
-        return res.redirect("/admin.html");
+        return res.json({ success: true });
     }
 
-    res.send("Login inválido");
+    res.status(401).json({ error: "Login inválido" });
 });
 
+// Adicionar produto
 app.post("/add-product", isAuth, upload.single("image"), (req, res) => {
     const { title, price } = req.body;
     const image = req.file.filename;
@@ -65,14 +71,24 @@ app.post("/add-product", isAuth, upload.single("image"), (req, res) => {
         VALUES (?, ?, ?)
     `).run(title, price, image);
 
-    res.redirect("/admin.html");
+    res.json({ success: true });
 });
 
+// Listar produtos
 app.get("/products", (req, res) => {
     const products = db.prepare("SELECT * FROM products").all();
     res.json(products);
 });
 
-app.listen(3000, () => {
-    console.log("Servidor rodando em http://localhost:3000");
+// Deletar produto
+app.delete("/delete-product/:id", isAuth, (req, res) => {
+    const id = req.params.id;
+    db.prepare("DELETE FROM products WHERE id = ?").run(id);
+    res.json({ success: true });
+});
+
+// Porta dinâmica do Render
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
