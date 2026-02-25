@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Admin - Papelaria Amor & Arte</title>
+
+<style>
+body{
+    margin:0;
+    font-family:'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #fff0f6, #f3e8ff);
+    padding:30px;
+}
+
+h1{
+    text-align:center;
+    color:#c084fc;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 15px 30px rgba(0,0,0,0.1);
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:10px;
+    border:1px solid #ddd;
+}
+
+button{
+    padding:12px 20px;
+    border:none;
+    border-radius:25px;
+    background: linear-gradient(90deg, #f472b6, #c084fc);
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.product{
+    margin-top:20px;
+    padding:15px;
+    border:1px solid #eee;
+    border-radius:10px;
+}
+
+.delete{
+    background:red;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Painel Administrativo</h1>
+
+<div class="container">
+
+<h3>Cadastrar Produto</h3>
+
+<form id="productForm" enctype="multipart/form-data">
+    <input type="text" name="title" placeholder="Nome do produto" required>
+    <input type="number" name="price" placeholder="Preço" required>
+    <input type="file" name="image" required>
+    <button type="submit">Publicar</button>
+</form>
+
+<h3>Produtos Cadastrados</h3>
+<div id="productList"></div>
+
+</div>
+
+<script>
+function loadProducts(){
+    fetch("/products")
+    .then(res => res.json())
+    .then(data => {
+        const list = document.getElementById("productList");
+        list.innerHTML = "";
+
+        data.forEach(p => {
+            list.innerHTML += `
+                <div class="product">
+                    <strong>${p.title}</strong><br>
+                    R$ ${p.price}<br>
+                    <img src="/uploads/${p.image}" width="100"><br>
+                    <button class="delete" onclick="deleteProduct(${p.id})">Excluir</button>
+                </div>
+            `;
+        });
+    });
+}
+
+function deleteProduct(id){
+    fetch("/delete-product/" + id, {
+        method:"DELETE"
+    })
+    .then(res => res.json())
+    .then(data => {
+        loadProducts();
+    });
+}
+
+document.getElementById("productForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    fetch("/add-product", {
+        method:"POST",
+        body:formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        this.reset();
+        loadProducts();
+    });
+});
+
+loadProducts();
+</script>
+
+</body>
+</html>

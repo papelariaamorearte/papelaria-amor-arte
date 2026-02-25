@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login - Papelaria Amor & Arte</title>
+
+<style>
+body{
+    margin:0;
+    font-family:'Segoe UI', sans-serif;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: linear-gradient(135deg, #fff0f6, #f3e8ff);
+}
+
+.container{
+    background:white;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 15px 30px rgba(0,0,0,0.1);
+    width:320px;
+    text-align:center;
+}
+
+h2{
+    margin-bottom:20px;
+    color:#c084fc;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:10px;
+    border:1px solid #ddd;
+    font-size:14px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    border:none;
+    border-radius:25px;
+    background: linear-gradient(90deg, #f472b6, #c084fc);
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    opacity:0.85;
+}
+
+.error{
+    color:red;
+    font-size:13px;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Área Administrativa</h2>
+
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Senha" required>
+        <button type="submit">Entrar</button>
+    </form>
+
+    <div class="error" id="errorMsg"></div>
+</div>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    fetch("/login", {
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            window.location.href="/admin.html";
+        }else{
+            document.getElementById("errorMsg").innerText="Email ou senha incorretos.";
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        document.getElementById("errorMsg").innerText="Erro ao conectar ao servidor.";
+    });
+});
+</script>
+
+</body>
+</html>

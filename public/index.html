@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Papelaria Amor & Arte</title>
+
+<style>
+body{
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #fff0f6, #f3e8ff);
+}
+
+/* HEADER */
+header{
+    background: linear-gradient(90deg, #f472b6, #c084fc);
+    padding:30px;
+    text-align:center;
+    color:white;
+    position:relative;
+}
+
+header h1{
+    margin:0;
+    font-size:32px;
+    letter-spacing:1px;
+}
+
+.sub{
+    font-size:14px;
+    margin-top:5px;
+    opacity:0.9;
+}
+
+.top-buttons{
+    position:absolute;
+    right:20px;
+    top:20px;
+    display:flex;
+    gap:10px;
+}
+
+.btn-top{
+    padding:8px 14px;
+    border-radius:25px;
+    text-decoration:none;
+    font-weight:600;
+    font-size:13px;
+}
+
+.instagram{
+    background:#E1306C;
+    color:white;
+}
+
+.admin{
+    background:white;
+    color:#c084fc;
+}
+
+/* BANNER */
+.banner{
+    text-align:center;
+    padding:50px 20px;
+}
+
+.banner h2{
+    font-size:28px;
+    color:#c084fc;
+}
+
+.banner p{
+    color:#555;
+}
+
+/* PRODUTOS */
+.container{
+    padding:30px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:25px;
+}
+
+.card{
+    background:white;
+    border-radius:20px;
+    box-shadow:0 15px 25px rgba(0,0,0,0.08);
+    overflow:hidden;
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-6px);
+}
+
+.card img{
+    width:100%;
+    height:230px;
+    object-fit:cover;
+}
+
+.card-content{
+    padding:20px;
+    text-align:center;
+}
+
+.card-content h3{
+    margin:10px 0;
+    color:#444;
+}
+
+.price{
+    font-size:18px;
+    font-weight:bold;
+    color:#f472b6;
+}
+
+/* WHATSAPP FLUTUANTE */
+.whatsapp-float{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#25D366;
+    color:white;
+    font-size:28px;
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    box-shadow:0 8px 15px rgba(0,0,0,0.2);
+    transition:0.3s;
+    z-index:1000;
+}
+
+.whatsapp-float:hover{
+    transform:scale(1.1);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Papelaria Amor & Arte</h1>
+    <div class="sub">Criando momentos especiais com carinho ✨</div>
+
+    <div class="top-buttons">
+        <a href="https://www.instagram.com/papelaria_amoreartee/" 
+           target="_blank" 
+           class="btn-top instagram">Instagram</a>
+
+        <a href="/login.html" 
+           class="btn-top admin">Admin</a>
+    </div>
+</header>
+
+<div class="banner">
+    <h2>Personalizados feitos com amor 💕</h2>
+    <p>Cada detalhe pensado para encantar.</p>
+</div>
+
+<div class="container" id="produtos"></div>
+
+<!-- BOTÃO WHATSAPP FLUTUANTE -->
+<a href="https://wa.me/557591844714?text=Olá! Vim pelo site e quero mais informações 💕"
+   target="_blank"
+   class="whatsapp-float">
+   💬
+</a>
+
+<script>
+fetch("/products")
+.then(res => res.json())
+.then(data => {
+    const div = document.getElementById("produtos");
+
+    if(data.length === 0){
+        div.innerHTML = "<p style='text-align:center;'>Em breve novos produtos encantadores 🌸</p>";
+        return;
+    }
+
+    data.forEach(p => {
+        div.innerHTML += `
+        <div class="card">
+            <img src="/uploads/${p.image}">
+            <div class="card-content">
+                <h3>${p.title}</h3>
+                <p class="price">R$ ${p.price}</p>
+            </div>
+        </div>
+        `;
+    });
+})
+.catch(err => {
+    console.error("Erro ao carregar produtos:", err);
+});
+</script>
+
+</body>
+</html>
